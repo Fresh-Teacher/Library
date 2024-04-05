@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Books</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Your Custom CSS -->
+    <link href="{{ url_for('static', filename='custom.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5 mb-4">Search Books</h1>
+        <form>
+            <div class="form-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by title or author">
+                <div id="searchResults" class="autocomplete-results"></div>
+            </div>
+        </form>
+    </div>
+    <!-- jQuery (required for Bootstrap) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Your Custom JS -->
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle click event on search results
+            $(document).on('click', '.autocomplete-item', function() {
+                // Redirect to book details page
+                var index = $(this).data('index');
+                if (index !== undefined) {
+                    window.location.href = '/book/' + index;
+                }
+            });
+
+            // Function to display autocomplete results
+            function displayResults(results) {
+                var html = '';
+                results.forEach(function(book, index) {
+                    html += '<div class="autocomplete-item" data-index="' + index + '">' + book.title + ' by ' + book.author + '</div>';
+                });
+                $('#searchResults').html(html);
+            }
+
+            // Function to handle input change
+            $('#searchInput').on('input', function() {
+                var query = $(this).val().trim();
+                if (query === '') {
+                    $('#searchResults').empty();
+                    return;
+                }
+                $.get('/autocomplete', { query: query }, function(data) {
+                    displayResults(data);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
